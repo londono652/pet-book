@@ -17,17 +17,17 @@ steps:
     npm run test-ci   
     ls /coverage
     ls     
-  displayName: 'npm install, unitTest and build'
+  displayName: 'npm install, Pruebas unitarias and build'
 
 - task: SonarCloudPrepare@1
-  displayName: 'Prepare analysis on Sonar'
+  displayName: 'Preparar analysis Sonar'
   inputs:
     SonarCloud: 'sonar-cloud'
     scannerMode: 'CLI'
     organization: 'londono652'
 
 - task: SonarCloudAnalyze@1
-  displayName: 'Run Code Analysis'
+  displayName: 'Correr Analisis de Codigo estatico'
 
 - task: SonarCloudPublish@1
   inputs:
@@ -40,7 +40,7 @@ steps:
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: 'dist/pet-book'
+    rootFolderOrFile: 'art/pet-book'
     includeRootFolder: true
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/pet-book-$(Build.BuildId).zip'
