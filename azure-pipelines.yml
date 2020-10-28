@@ -24,7 +24,7 @@ steps:
   inputs:
     SonarCloud: 'sonar-cloud'
     scannerMode: 'CLI'
-    organization: 'londono65289'
+    organization: 'londono652'
 
 - task: SonarCloudAnalyze@1
   displayName: 'Run Code Analysis'
@@ -36,7 +36,7 @@ steps:
 - task: sonarcloud-buildbreaker@2
   inputs:
     SonarCloud: 'sonar-cloud'
-    organization: 'londono65289'
+    organization: 'londono652'
 
 - task: ArchiveFiles@2
   inputs:
