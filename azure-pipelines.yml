@@ -40,7 +40,7 @@ steps:
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: 'art/pet-book'
+    rootFolderOrFile: 'dist/pet-book'
     includeRootFolder: true
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/pet-book-$(Build.BuildId).zip'
