@@ -13,11 +13,14 @@ steps:
 - script: |
     npm install -g @angular/cli
     npm install
-    ng build --prod
+    ng build --prod  
+  displayName: 'Build'
+
+- script: |
     npm run test-ci   
     ls /coverage
     ls     
-  displayName: 'npm install, Pruebas unitarias and build'
+  displayName: 'pruebas unitarias'
 
 - task: SonarCloudPrepare@1
   displayName: 'Preparar analysis Sonar'
