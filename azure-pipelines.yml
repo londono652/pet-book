@@ -55,6 +55,6 @@ steps:
     awsCredentials: 'awsconection'
     regionName: 'us-east-1'
     bucketName: 'jlondono-petbook'
-    globExpressions: '*.zip'
+    globExpressions: '$(Build.ArtifactStagingDirectory)/*.zip'
     targetFolder: 'artefactos'
     createBucket: true
