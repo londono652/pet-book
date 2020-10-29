@@ -47,3 +47,11 @@ steps:
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
+- task: S3Upload@1
+  inputs:
+    awsCredentials: 'awsconection'
+    regionName: 'us-east-1'
+    bucketName: 'jlondono-petbook'
+    globExpressions: '*.zip'
+    targetFolder: 'artefactos'
+    createBucket: true
