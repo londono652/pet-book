@@ -60,3 +60,9 @@ steps:
     globExpressions: '*.zip'
     targetFolder: 'artefactos'
     createBucket: true
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub'
+    repository: 'petbook'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
