@@ -1,5 +1,7 @@
 trigger:
 - master
+variables:
+ ImageName: 'londono652/petbook:$(Build.BuildId)'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -60,16 +62,20 @@ steps:
     globExpressions: '*.zip'
     targetFolder: 'artefactos'
     createBucket: true
-- task: Docker@2
+- task: Docker@1
   inputs:
-    containerRegistry: 'dockerhub'
-    repository: 'petbook'
-    command: 'build'
-    Dockerfile: '**/Dockerfile'
-    tags: 'petbook'
-- task: Docker@2
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'dockerhub'
+    command: 'Build an image'
+    dockerFile: '**/Dockerfile'
+    imageName: '$(ImageName)'
+    includeLatestTag: true
+    useDefaultContext: false
+    buildContext: '.'
+
+- task: Docker@1
   inputs:
-    containerRegistry: 'dockerhub'
-    repository: 'petbook'
-    command: 'push'
-    tags: 
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'dockerhub'
+    command: 'Push an image'
+    imageName: '$(ImageName)'
