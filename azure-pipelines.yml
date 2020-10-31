@@ -75,3 +75,5 @@ steps:
     containerRegistry: 'dockerhub'
     repository: 'petbook'
     command: 'push'
+    tags: 
+    addPipelineData: false
