@@ -1,5 +1,7 @@
 trigger:
 - master
+variables:
+ ImageName: 'londono652/petbook:$(Build.BuildId)'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -50,11 +52,30 @@ steps:
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
+
 - task: S3Upload@1
   inputs:
     awsCredentials: 'awsconection'
     regionName: 'us-east-1'
     bucketName: 'jlondono-petbook'
+    sourceFolder: '$(Build.ArtifactStagingDirectory)'
     globExpressions: '*.zip'
     targetFolder: 'artefactos'
     createBucket: true
+- task: Docker@1
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'dockerhub'
+    command: 'Build an image'
+    dockerFile: '**/Dockerfile'
+    imageName: '$(ImageName)'
+    includeLatestTag: true
+    useDefaultContext: false
+    buildContext: '.'
+
+- task: Docker@1
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'dockerhub'
+    command: 'Push an image'
+    imageName: '$(ImageName)'
