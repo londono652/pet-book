@@ -2,11 +2,20 @@ trigger:
 - master
 variables:
  ImageName: 'londono652/petbook:$(Build.BuildId)'
+ YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
 
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: Cache@2
+  inputs:
+    key: 'yarn | "$(Agent.OS)" | yarn.lock'
+    restoreKeys: |
+       yarn | "$(Agent.OS)"
+       yarn
+    path: $(YARN_CACHE_FOLDER)
+  displayName: Cache Yarn packages
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
@@ -22,14 +31,16 @@ steps:
     npm run test-ci   
     ls /coverage
     ls     
-  displayName: 'pruebas unitarias'
+  displayName: 'Pruebas unitarias'
 
 - task: SonarQubePrepare@4
   inputs:
     SonarQube: 'sonarqube'
     scannerMode: 'CLI'
     configMode: 'file'
+  displayName: 'Configurar Sonar'
 - task: SonarQubeAnalyze@4
+  displayName: 'Analisis Sonar'
 
 - task: ArchiveFiles@2
   inputs:
@@ -38,8 +49,10 @@ steps:
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     replaceExistingArchive: true
+  displayName: 'Archivar Artefacto'
 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publicar Artefacto'
 
 - task: Docker@1
   inputs:
@@ -51,6 +64,7 @@ steps:
     includeLatestTag: true
     useDefaultContext: false
     buildContext: '.'
+  displayName: 'Construir Imagen Docker'
 
 - task: Docker@1
   inputs:
@@ -58,3 +72,4 @@ steps:
     dockerRegistryEndpoint: 'dockerhub'
     command: 'Push an image'
     imageName: '$(ImageName)'
+  displayName: 'Publicar Imagen Docker'
