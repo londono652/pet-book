@@ -64,3 +64,10 @@ steps:
     command: 'Push an image'
     imageName: '$(ImageName)'
   displayName: 'Publicar Imagen Docker'
+
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'awsconection'
+    regionName: 'us-east-1'
+    awsCommand: 'mssh i-0a12f06b051e62919'
+    awsSubCommand: 'docker pull londono652/petbook:latest'
