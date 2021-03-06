@@ -77,6 +77,17 @@ steps:
   inputs:
     sshEndpoint: 'SSHInstance'
     runOptions: 'inline'
+    inline: |
+      docker stop myapp
+      docker rm myapp
+    failOnStdErr: false
+    readyTimeout: '20000'
+  displayName: 'Detener Contenedor si existe'
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'SSHInstance'
+    runOptions: 'inline'
     inline: 'docker run --name myapp -d -p 8000:80 londono652/petbook:latest'
     readyTimeout: '20000'
   displayName: 'Desplegar Contenedor MyApp'
