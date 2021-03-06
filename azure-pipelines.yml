@@ -71,4 +71,4 @@ steps:
     regionName: 'us-east-1'
     awsCommand: 'ssm'
     awsSubCommand: 'send-command'
-    awsArguments: '--document-name "AWS-RunShellScript" --targets ''[{"Key":"InstanceIds","Values":["i-0a12f06b051e62919"]}]'' --parameters ''{"commands":["#!/bin/bash","docker pull londono652/petbook:latest","docker run -p 127.0.0.1:8000:4200/tcp londono652/petbook"]}'''
+    awsArguments: '--instance-ids "i-0a12f06b051e62919" --document-name "AWS-RunShellScript" --parameters commands="docker pull londono652/petbook:latest"'
