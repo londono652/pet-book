@@ -7,15 +7,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: Cache@2
-  inputs:
-    key: 'npm | "$(Agent.OS)" | package-lock.json'
-    restoreKeys: |
-       npm | "$(Agent.OS)"
-    path: $(npm_config_cache)
-  displayName: Cache npm
-
-- script: npm ci
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
@@ -23,7 +14,6 @@ steps:
 
 - script: |
     npm install -g @angular/cli
-    npm install
     ng build --prod  
   displayName: 'Build'
 
