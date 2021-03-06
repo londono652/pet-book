@@ -24,24 +24,12 @@ steps:
     ls     
   displayName: 'pruebas unitarias'
 
-- task: SonarCloudPrepare@1
-  displayName: 'Preparar analysis Sonar'
+- task: SonarQubePrepare@4
   inputs:
-    SonarCloud: 'sonar-cloud'
+    SonarQube: 'sonarqube'
     scannerMode: 'CLI'
-    organization: 'londono652'
-
-- task: SonarCloudAnalyze@1
-  displayName: 'Correr Analisis de Codigo estatico'
-
-- task: SonarCloudPublish@1
-  inputs:
-    pollingTimeoutSec: '300'
-
-- task: sonarcloud-buildbreaker@2
-  inputs:
-    SonarCloud: 'sonar-cloud'
-    organization: 'londono652'
+    configMode: 'file'
+- task: SonarQubeAnalyze@4
 
 - task: ArchiveFiles@2
   inputs:
@@ -53,15 +41,6 @@ steps:
 
 - task: PublishBuildArtifacts@1
 
-- task: S3Upload@1
-  inputs:
-    awsCredentials: 'awsconection'
-    regionName: 'us-east-1'
-    bucketName: 'jlondono-petbook'
-    sourceFolder: '$(Build.ArtifactStagingDirectory)'
-    globExpressions: '*.zip'
-    targetFolder: 'artefactos'
-    createBucket: true
 - task: Docker@1
   inputs:
     containerregistrytype: 'Container Registry'
