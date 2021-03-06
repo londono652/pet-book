@@ -31,7 +31,7 @@ steps:
     npm run test-ci   
     ls /coverage
     ls     
-  displayName: 'Pruebas unitarias'
+  displayName: 'Pruebas Unitarias'
 
 - task: SonarQubePrepare@4
   inputs:
@@ -40,7 +40,7 @@ steps:
     configMode: 'file'
   displayName: 'Configurar Sonar'
 - task: SonarQubeAnalyze@4
-  displayName: 'Analisis Sonar'
+  displayName: 'Analisis Codigo y Cobertura'
 
 - task: ArchiveFiles@2
   inputs:
