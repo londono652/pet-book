@@ -2,12 +2,20 @@ trigger:
 - master
 variables:
  ImageName: 'londono652/petbook:$(Build.BuildId)'
- YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-
+ npm_config_cache: $(Pipeline.Workspace)/.npm
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: Cache@2
+  inputs:
+    key: 'npm | "$(Agent.OS)" | package-lock.json'
+    restoreKeys: |
+       npm | "$(Agent.OS)"
+    path: $(npm_config_cache)
+  displayName: Cache npm
+
+- script: npm ci
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
@@ -18,15 +26,6 @@ steps:
     npm install
     ng build --prod  
   displayName: 'Build'
-
-- task: Cache@2
-  inputs:
-    key: 'yarn | "$(Agent.OS)" | yarn.lock'
-    restoreKeys: |
-       yarn | "$(Agent.OS)"
-       yarn
-    path: $(YARN_CACHE_FOLDER)
-  displayName: Cache Yarn packages
 
 - script: |
     npm run test-ci   
