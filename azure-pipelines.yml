@@ -69,7 +69,23 @@ steps:
   inputs:
     sshEndpoint: 'SSHInstance'
     runOptions: 'inline'
-    inline: |
-      docker pull londono652/petbook:latest
-      docker run -p 127.0.0.1:8000:4200/tcp londono652/petbook
-    readyTimeout: '40000'
+    inline: 'docker pull londono652/petbook:latest'
+    readyTimeout: '20000'
+  displayName: 'Descargar Imagen Docker'
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'SSHInstance'
+    runOptions: 'inline'
+    inline: 'docker stop myapp'
+    failOnStdErr: false
+    readyTimeout: '20000'
+  displayName: 'Detener Contenedor si existe'
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'SSHInstance'
+    runOptions: 'inline'
+    inline: 'docker run --name myapp -d -p 8000:80 londono652/petbook:latest'
+    readyTimeout: '20000'
+  displayName: 'Desplegar Contenedor MyApp'
