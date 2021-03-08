@@ -10,14 +10,21 @@ stages:
     jobs:
       - job:
         steps:
+          - task: Cache@2
+            inputs:
+              key: '**/package-lock.json, !**/node_modules/**/package-lock.json, !**/.*/**/package-lock.json'
+              path: '$(Build.SourcesDirectory)/node_modules'
+              cacheHitVar: 'CacheRestored'
+            displayName: 'Cachear dependencias'
           - task: NodeTool@0
             inputs:
               versionSpec: '10.x'
             displayName: 'Install Node.js'
-
+          
           - script: |
               npm install -g @angular/cli
               npm install 
+            condition: eq(variables['CacheRestored'],False)
             displayName: 'Instalar Dependencias'
 
           - script: |
