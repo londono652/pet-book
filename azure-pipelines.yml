@@ -85,7 +85,7 @@ stages:
             inputs:
               sshEndpoint: 'SSHInstance'
               runOptions: 'inline'
-              inline: 'docker pull londono652/petbook:latest'
+              inline: 'docker pull $(ImageName)'
               readyTimeout: '20000'
             displayName: 'Descargar Imagen Docker'
 
@@ -104,6 +104,6 @@ stages:
             inputs:
              sshEndpoint: 'SSHInstance'
              runOptions: 'inline'
-             inline: 'docker run --name myapp -d -p 8000:80 londono652/petbook:latest'
+             inline: 'docker run --name myapp -d -p 8000:80 $(ImageName)'
              readyTimeout: '20000'
             displayName: 'Desplegar Contenedor MyApp'
