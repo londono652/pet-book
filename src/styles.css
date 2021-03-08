@@ -1,0 +1,6 @@
+  .btn-primary:hover, .btn-primary:active,.btn-primary:focus,.btn-primary{
+    background-color: var(--red);
+  }
+  .btn:hover, .btn:active,.btn:focus,.btn{
+    background-color: var(--red);
+  }
