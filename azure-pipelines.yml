@@ -15,7 +15,7 @@ stages:
               key: '**/package-lock.json, !**/node_modules/**/package-lock.json, !**/.*/**/package-lock.json'
               path: '$(Build.SourcesDirectory)/node_modules'
               cacheHitVar: 'CacheRestored'
-            displayName: 'Cachear dependencias'
+            displayName: 'Cachear Dependencias'
           - task: NodeTool@0
             inputs:
               versionSpec: '10.x'
