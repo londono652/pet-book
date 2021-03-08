@@ -39,6 +39,22 @@ stages:
               ls /coverage
               ls     
             displayName: 'Pruebas Unitarias'
+          - task: SonarQubePrepare@4
+            inputs:
+              SonarQube: 'sonarqube'
+              scannerMode: 'CLI'
+              configMode: 'file'
+            displayName: 'Configurar Parámetros Sonar'
+          - task: SonarQubeAnalyze@4
+            displayName: 'Análisis Código Estático y Cobertura Sonar'
+          - task: SonarQubePublish@4
+            inputs:
+             pollingTimeoutSec: '300'
+            displayName: 'Publicar Quality Gates Sonar'
+          - task: sonar-buildbreaker@8
+            inputs:
+             SonarQube: 'sonarqube'
+            displayName: 'Validar Quality Gate Sonar'
           - task: ArchiveFiles@2
             inputs:
               rootFolderOrFile: 'dist'
@@ -46,18 +62,9 @@ stages:
               archiveType: 'zip'
               archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
               replaceExistingArchive: true
-            displayName: 'Archivar Artefacto'
+            displayName: 'Archivar Artefacto Azure'
           - task: PublishBuildArtifacts@1
-            displayName: 'Publicar Artefacto'
-
-          - task: SonarQubePrepare@4
-            inputs:
-              SonarQube: 'sonarqube'
-              scannerMode: 'CLI'
-              configMode: 'file'
-            displayName: 'Configurar Sonar'
-          - task: SonarQubeAnalyze@4
-            displayName: 'Analisis Codigo y Cobertura'
+            displayName: 'Publicar Artefacto en Azure'
           - task: Docker@1
             inputs:
               containerregistrytype: 'Container Registry'
