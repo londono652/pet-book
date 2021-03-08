@@ -45,6 +45,10 @@ stages:
     jobs:
       - job:
         steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              targetPath: '$(Pipeline.Workspace)'
           - task: ArchiveFiles@2
             inputs:
               rootFolderOrFile: 'dist'
