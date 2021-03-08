@@ -6,7 +6,7 @@ variables:
 pool:
   vmImage: 'ubuntu-latest'
 stages:
-  - stage: Construir_y_Correr_Unitarias
+  - stage: CI
     jobs:
       - job:
         steps:
@@ -19,9 +19,11 @@ stages:
               npm install -g @angular/cli
               npm install 
             displayName: 'Instalar Dependencias'
+
           - script: |
               ng build --prod  
             displayName: 'Build'
+
           - script: |
               npm run test-ci   
               ls /coverage
@@ -35,43 +37,17 @@ stages:
               archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
               replaceExistingArchive: true
             displayName: 'Archivar Artefacto'
-          - task: CopyFiles@2
-            displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)"
-            inputs:
-              SourceFolder: 'dist'
-              Contents: '*.*'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-              OverWrite: true
           - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: '$(ArtifactName)'
-              publishLocation: 'Container'
+            displayName: 'Publicar Artefacto'
 
-  - stage: Analisis_Codigo_Estatico
-    jobs:
-      - job:
-        steps:
           - task: SonarQubePrepare@4
             inputs:
               SonarQube: 'sonarqube'
               scannerMode: 'CLI'
               configMode: 'file'
             displayName: 'Configurar Sonar'
-
           - task: SonarQubeAnalyze@4
             displayName: 'Analisis Codigo y Cobertura'
-
-  - stage: Publicacion_Artefactos_Docker
-    jobs:
-      - job:
-        steps:
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: "current"
-              downloadType: "single"
-              artifactName: "$(ArtifactName)"
-              downloadPath: "$(System.DefaultWorkingDirectory)"
           - task: Docker@1
             inputs:
               containerregistrytype: 'Container Registry'
@@ -83,7 +59,6 @@ stages:
               useDefaultContext: false
               buildContext: '.'
             displayName: 'Construir Imagen Docker'
-
           - task: Docker@1
             inputs:
               containerregistrytype: 'Container Registry'
@@ -91,8 +66,8 @@ stages:
               command: 'Push an image'
               imageName: '$(ImageName)'
             displayName: 'Publicar Imagen Docker'
-
-  - stage: Despliegue_Contenedor_AmazonEC2
+          
+  - stage: CD
     jobs:
       - job:
         steps:
