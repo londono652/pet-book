@@ -5,89 +5,105 @@ variables:
  npm_config_cache: $(Pipeline.Workspace)/.npm
 pool:
   vmImage: 'ubuntu-latest'
+stages:
+  - stage: CI
+    jobs:
+      - job:
+        steps:
+          - task: Cache@2
+            inputs:
+              key: '**/package-lock.json, !**/node_modules/**/package-lock.json, !**/.*/**/package-lock.json'
+              path: '$(Build.SourcesDirectory)/node_modules'
+              cacheHitVar: 'CacheRestored'
+            displayName: 'Cachear Dependencias'
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '10.x'
+            displayName: 'Install Node.js'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+          - script: |
+              npm install -g @angular/cli
+            displayName: 'Instalar Angular CLI'
 
-- script: |
-    npm install -g @angular/cli
-    npm install
-    ng build --prod  
-  displayName: 'Build'
+          - script: |
+              npm install 
+            condition: eq(variables['CacheRestored'],False)
+            displayName: 'Instalar Dependencias'
 
-- script: |
-    npm run test-ci   
-    ls /coverage
-    ls     
-  displayName: 'Pruebas Unitarias'
+          - script: |
+              ng build --prod  
+            displayName: 'Build'
 
-- task: SonarQubePrepare@4
-  inputs:
-    SonarQube: 'sonarqube'
-    scannerMode: 'CLI'
-    configMode: 'file'
-  displayName: 'Configurar Sonar'
-- task: SonarQubeAnalyze@4
-  displayName: 'Analisis Codigo y Cobertura'
+          - script: |
+              npm run test-ci   
+              ls /coverage
+              ls     
+            displayName: 'Pruebas Unitarias'
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: 'dist'
+              includeRootFolder: true
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+            displayName: 'Archivar Artefacto'
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publicar Artefacto'
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'dist'
-    includeRootFolder: true
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    replaceExistingArchive: true
-  displayName: 'Archivar Artefacto'
+          - task: SonarQubePrepare@4
+            inputs:
+              SonarQube: 'sonarqube'
+              scannerMode: 'CLI'
+              configMode: 'file'
+            displayName: 'Configurar Sonar'
+          - task: SonarQubeAnalyze@4
+            displayName: 'Analisis Codigo y Cobertura'
+          - task: Docker@1
+            inputs:
+              containerregistrytype: 'Container Registry'
+              dockerRegistryEndpoint: 'dockerhub'
+              command: 'Build an image'
+              dockerFile: '**/Dockerfile'
+              imageName: '$(ImageName)'
+              includeLatestTag: true
+              useDefaultContext: false
+              buildContext: '.'
+            displayName: 'Construir Imagen Docker'
+          - task: Docker@1
+            inputs:
+              containerregistrytype: 'Container Registry'
+              dockerRegistryEndpoint: 'dockerhub'
+              command: 'Push an image'
+              imageName: '$(ImageName)'
+            displayName: 'Publicar Imagen Docker'
+          
+  - stage: CD
+    jobs:
+      - job:
+        steps:
+          - task: SSH@0
+            inputs:
+              sshEndpoint: 'SSHInstance'
+              runOptions: 'inline'
+              inline: 'docker pull londono652/petbook:latest'
+              readyTimeout: '20000'
+            displayName: 'Descargar Imagen Docker'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publicar Artefacto'
+          - task: SSH@0
+            inputs:
+              sshEndpoint: 'SSHInstance'
+              runOptions: 'inline'
+              inline: |
+                docker stop myapp
+                docker rm myapp
+              failOnStdErr: false
+              readyTimeout: '20000'
+            displayName: 'Detener Contenedor si existe'
 
-- task: Docker@1
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'dockerhub'
-    command: 'Build an image'
-    dockerFile: '**/Dockerfile'
-    imageName: '$(ImageName)'
-    includeLatestTag: true
-    useDefaultContext: false
-    buildContext: '.'
-  displayName: 'Construir Imagen Docker'
-
-- task: Docker@1
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'dockerhub'
-    command: 'Push an image'
-    imageName: '$(ImageName)'
-  displayName: 'Publicar Imagen Docker'
-
-- task: SSH@0
-  inputs:
-    sshEndpoint: 'SSHInstance'
-    runOptions: 'inline'
-    inline: 'docker pull londono652/petbook:latest'
-    readyTimeout: '20000'
-  displayName: 'Descargar Imagen Docker'
-
-- task: SSH@0
-  inputs:
-    sshEndpoint: 'SSHInstance'
-    runOptions: 'inline'
-    inline: |
-      docker stop myapp
-      docker rm myapp
-    failOnStdErr: false
-    readyTimeout: '20000'
-  displayName: 'Detener Contenedor si existe'
-
-- task: SSH@0
-  inputs:
-    sshEndpoint: 'SSHInstance'
-    runOptions: 'inline'
-    inline: 'docker run --name myapp -d -p 8000:80 londono652/petbook:latest'
-    readyTimeout: '20000'
-  displayName: 'Desplegar Contenedor MyApp'
+          - task: SSH@0
+            inputs:
+             sshEndpoint: 'SSHInstance'
+             runOptions: 'inline'
+             inline: 'docker run --name myapp -d -p 8000:80 londono652/petbook:latest'
+             readyTimeout: '20000'
+            displayName: 'Desplegar Contenedor MyApp'
