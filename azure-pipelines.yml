@@ -20,9 +20,12 @@ stages:
             inputs:
               versionSpec: '10.x'
             displayName: 'Install Node.js'
-          
+
           - script: |
               npm install -g @angular/cli
+            displayName: 'Instalar Angular CLI'
+
+          - script: |
               npm install 
             condition: eq(variables['CacheRestored'],False)
             displayName: 'Instalar Dependencias'
