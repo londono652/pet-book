@@ -17,15 +17,27 @@ stages:
 
           - script: |
               npm install -g @angular/cli
-              npm install
+              npm install 
+            displayName: 'Install'
+          - script: |
               ng build --prod  
             displayName: 'Build'
-
           - script: |
               npm run test-ci   
               ls /coverage
               ls     
             displayName: 'Pruebas Unitarias'
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: 'dist'
+              includeRootFolder: true
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+            displayName: 'Archivar Artefacto'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publicar Artefacto Azure'
 
   - stage: Analisis_Codigo_Estatico
     jobs:
@@ -41,26 +53,10 @@ stages:
           - task: SonarQubeAnalyze@4
             displayName: 'Analisis Codigo y Cobertura'
 
-  - stage: Publicacion_Artefactos
+  - stage: Publicacion_Artefactos_Docker
     jobs:
       - job:
         steps:
-          - task: DownloadPipelineArtifact@2
-            inputs:
-              buildType: 'current'
-              targetPath: '$(Pipeline.Workspace)'
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: 'dist'
-              includeRootFolder: true
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-              replaceExistingArchive: true
-            displayName: 'Archivar Artefacto'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publicar Artefacto'
-
           - task: Docker@1
             inputs:
               containerregistrytype: 'Container Registry'
@@ -81,7 +77,7 @@ stages:
               imageName: '$(ImageName)'
             displayName: 'Publicar Imagen Docker'
 
-  - stage: Despliegue
+  - stage: Despliegue_Contenedor_AmazonEC2
     jobs:
       - job:
         steps:
