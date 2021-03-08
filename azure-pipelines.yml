@@ -18,7 +18,7 @@ stages:
           - script: |
               npm install -g @angular/cli
               npm install 
-            displayName: 'Install'
+            displayName: 'Instalar Dependencias'
           - script: |
               ng build --prod  
             displayName: 'Build'
@@ -35,9 +35,18 @@ stages:
               archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
               replaceExistingArchive: true
             displayName: 'Archivar Artefacto'
-
+          - task: CopyFiles@2
+            displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)"
+            inputs:
+              SourceFolder: 'dist'
+              Contents: '*.*'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+              OverWrite: true
           - task: PublishBuildArtifacts@1
-            displayName: 'Publicar Artefacto Azure'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: '$(ArtifactName)'
+              publishLocation: 'Container'
 
   - stage: Analisis_Codigo_Estatico
     jobs:
@@ -57,6 +66,12 @@ stages:
     jobs:
       - job:
         steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: "current"
+              downloadType: "single"
+              artifactName: "$(ArtifactName)"
+              downloadPath: "$(System.DefaultWorkingDirectory)"
           - task: Docker@1
             inputs:
               containerregistrytype: 'Container Registry'
