@@ -1,6 +1,10 @@
   .btn-primary:hover, .btn-primary:active,.btn-primary:focus,.btn-primary{
-    background-color: var(--red);
+    background-color: var(--gray);
+  }
+  .btn-success:hover, .btn-success:active,.btn-success:focus,.btn-success{
+    background-color: var(--gray);
+    border-color: var(--gray);
   }
   .btn:hover, .btn:active,.btn:focus,.btn{
-    background-color: var(--red);
+    background-color: var(--gray);
   }
