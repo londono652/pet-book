@@ -5,7 +5,7 @@ import { GalleryComponent } from './image-gallery.component';
 import { By } from '@angular/platform-browser';
 import { doesNotReject } from 'assert';
 import { DebugElement } from '@angular/core';
-
+//--
 describe('ImageGalleryComponent', () => {
   let component: GalleryComponent;
   let fixture: ComponentFixture<GalleryComponent>;

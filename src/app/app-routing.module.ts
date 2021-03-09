@@ -8,7 +8,7 @@ const routes: Routes = [
   { path: '', component: GalleryComponent },
   { path: 'image/:id', component: ImageDetailComponent },
 ];
-
+//
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]

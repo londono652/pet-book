@@ -7,7 +7,7 @@ const Items = [
   { "id": 4, "brand": "gato", "url": "assets/images/gato2.jpeg" },
   { "id": 5, "brand": "perro", "url": "assets/images/perro3.jpg" },
 ]  
-
+//
 describe('FilterimagesPipe', () => {
   it('create an instance', () => {
     const pipe = new FilterimagesPipe();

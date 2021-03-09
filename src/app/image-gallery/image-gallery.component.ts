@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';    
 import { ImageService } from '../image.service';    
-    
+//--
 @Component({    
   selector: 'app-imagegallery',    
   templateUrl: './image-gallery.component.html',    
